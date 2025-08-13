@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: worms
+      POSTGRES_PASSWORD: spacepass
+      POSTGRES_DB: worms_in_space_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U worms -d worms_in_space_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  worms_in_space:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "ecto://worms:spacepass@postgres/worms_in_space_dev"
+      SECRET_KEY_BASE: "your-secret-key-base-here"
+      PHX_HOST: "localhost"
+      MIX_ENV: "dev"
+    volumes:
+      - .:/app
+      - deps:/app/deps
+      - build:/app/_build
+      - node_modules:/app/assets/node_modules
+    command: sh -c "echo 'Waiting for PostgreSQL...' && while ! pg_isready -h postgres -U worms; do sleep 1; done && echo 'PostgreSQL is ready!' && mix deps.get && mix ecto.create && mix ecto.migrate && mix phx.server"
+
+
+volumes:
+  postgres_data:
+  deps:
+  build:
+  node_modules:
