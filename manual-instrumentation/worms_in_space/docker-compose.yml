@@ -31,6 +31,11 @@ services:
       SECRET_KEY_BASE: "your-secret-key-base-here"
       PHX_HOST: "localhost"
       MIX_ENV: "dev"
+      # OpenTelemetry/Splunk Configuration
+      SPLUNK_REALM: "${SPLUNK_REALM:-us1}"
+      SPLUNK_ACCESS_TOKEN: "${SPLUNK_ACCESS_TOKEN}"
+      OTEL_SERVICE_NAME: "${OTEL_SERVICE_NAME:-worms-in-space-backend}"
+      OTEL_ENVIRONMENT: "${OTEL_ENVIRONMENT:-development}"
     volumes:
       - .:/app
       - deps:/app/deps

@@ -7,6 +7,36 @@ import Config
 # any compile-time configuration in here, as it won't be applied.
 # The block below contains prod specific runtime configuration.
 
+# OpenTelemetry Configuration
+splunk_realm = System.get_env("SPLUNK_REALM", "us0")
+splunk_access_token = System.get_env("SPLUNK_ACCESS_TOKEN", "")
+service_name = System.get_env("OTEL_SERVICE_NAME", "worms-in-space-backend")
+environment = System.get_env("OTEL_ENVIRONMENT", "development")
+
+config :opentelemetry,
+  resource: [
+    service: %{
+      name: service_name,
+      version: "1.0.0"
+    },
+    deployment: %{
+      environment: environment
+    },
+    splunk: %{
+      realm: splunk_realm
+    }
+  ],
+  span_processor: :batch,
+  traces_exporter: :otlp,
+  sampler: {:parent_based, %{root: :always_on}}
+
+config :opentelemetry_exporter,
+  otlp_protocol: :grpc,
+  otlp_endpoint: "https://ingest.#{splunk_realm}.signalfx.com:443",
+  otlp_headers: [
+    {"x-sf-token", splunk_access_token}
+  ]
+
 # Start the phoenix server if environment is set and running in a release
 if System.get_env("PHX_SERVER") && System.get_env("RELEASE_NAME") do
   config :worms_in_space, WormsInSpaceWeb.Endpoint, server: true
