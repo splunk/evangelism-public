@@ -46,7 +46,15 @@ defp deps do
     {:absinthe_plug, "~> 1.5"},
     {:absinthe_phoenix, "~> 2.0"},
     {:cors_plug, "~> 3.0"},
-    {:esbuild, "~> 0.8", runtime: Mix.env() == :dev}
+    {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
+    # OpenTelemetry dependencies
+    {:opentelemetry, "~> 1.3"},
+    {:opentelemetry_api, "~> 1.2"},
+    {:opentelemetry_exporter, "~> 1.6"},
+    {:opentelemetry_phoenix, "~> 1.1"},
+    {:opentelemetry_ecto, "~> 1.1"},
+    {:opentelemetry_absinthe, "~> 2.2"},
+    {:opentelemetry_cowboy, "~> 0.2"}
   ]
 end
 

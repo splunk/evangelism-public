@@ -1,4 +1,4 @@
-FROM node:10-alpine AS worms-in-space-npm
+FROM node:18-alpine AS worms-in-space-npm
 WORKDIR /app/npm
 COPY ./assets/package.json /app/npm/package.json
 COPY ./assets/package-lock.json /app/npm/package-lock.json
