@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
+import { SplunkRum } from '@splunk/otel-web';
 
 interface TimeSlot {
     id: number | string;
@@ -120,14 +121,29 @@ const WormTimeSlots = () => {
     };
 
     const handleDeleteScheduledWalk = async (walkId: string) => {
+        // Create custom span for space walk deletion operation
+        const span = SplunkRum.provider.getTracer('worms-in-space-frontend').startSpan('delete_scheduled_walk');
+        span.setAttributes({
+            'spacewalk.delete.walk_id': walkId
+        });
+        
         try {
             await deleteScheduledWalk({ 
                 variables: { id: walkId }
             });
             // Refetch the scheduled walks to update the UI
             refetchScheduledWalks();
+            
+            span.setAttributes({
+                'spacewalk.delete.success': true
+            });
+            span.setStatus({ code: 1 }); // OK status
         } catch (error) {
+            span.recordException(error as Error);
+            span.setStatus({ code: 2, message: (error as Error).message });
             console.error('Error deleting scheduled walk:', error);
+        } finally {
+            span.end();
         }
     };
 
@@ -138,33 +154,56 @@ const WormTimeSlots = () => {
         setSubmitError('');
         setIsSubmitting(true);
 
+        // Create custom span for space walk scheduling operation
+        const span = SplunkRum.provider.getTracer('worms-in-space-frontend').startSpan('schedule_space_walk');
+        
         try {
             let variables: { id?: string; alternateTime?: string } = {};
 
             if (selectedTimeSlotId) {
                 variables.id = selectedTimeSlotId;
+                span.setAttributes({
+                    'spacewalk.slot_type': 'predefined',
+                    'spacewalk.slot_id': selectedTimeSlotId
+                });
             } else if (alternateTime) {
                 const isoString = convertToISOString(alternateTime);
                 if (!isValidDateTime(isoString)) {
+                    span.recordException(new Error('Invalid date and time selected'));
+                    span.setStatus({ code: 2, message: 'Invalid date and time' });
                     setSubmitError('Please select a valid date and time');
                     setIsSubmitting(false);
                     return;
                 }
                 variables.alternateTime = isoString;
+                span.setAttributes({
+                    'spacewalk.slot_type': 'custom',
+                    'spacewalk.custom_time': isoString
+                });
             }
 
             const result = await wormSpaceWalk({ variables });
             
             if (result.data?.wormSpaceWalk) {
+                span.setAttributes({
+                    'spacewalk.scheduled': true,
+                    'spacewalk.result_time': result.data.wormSpaceWalk.startTime
+                });
+                
                 setSpaceWalkResult({ startTime: result.data.wormSpaceWalk.startTime });
                 
                 // Refetch scheduled walks to update the sidebar
                 refetchScheduledWalks();
                 setViewState('success');
+                
+                span.setStatus({ code: 1 }); // OK status
             }
         } catch (err: any) {
+            span.recordException(err);
+            span.setStatus({ code: 2, message: err.message });
             setSubmitError(err.message || 'An error occurred while scheduling your space walk');
         } finally {
+            span.end();
             setIsSubmitting(false);
         }
     };
