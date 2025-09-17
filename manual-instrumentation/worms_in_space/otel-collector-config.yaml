@@ -1,0 +1,58 @@
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+        cors:
+          allowed_origins:
+            - "http://localhost:4000"
+            - "http://localhost:*"
+            - "http://127.0.0.1:*"
+          allowed_headers:
+            - "*"
+          max_age: 7200
+
+processors:
+  batch:
+    send_batch_size: 1024
+    timeout: 5s
+
+  resource:
+    attributes:
+      - key: deployment.environment
+        from_attribute: deployment.environment
+        action: upsert
+
+exporters:
+  debug:
+    verbosity: detailed
+    sampling_initial: 5
+    sampling_thereafter: 100
+
+  otlp/splunk:
+    endpoint: https://ingest.${SPLUNK_REALM}.signalfx.com:443
+    headers:
+      X-SF-Token: ${SPLUNK_ACCESS_TOKEN}
+
+  signalfx:
+    realm: ${SPLUNK_REALM}
+    access_token: ${SPLUNK_ACCESS_TOKEN}
+
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch, resource]
+      exporters: [debug, otlp/splunk]
+
+    metrics:
+      receivers: [otlp]
+      processors: [batch, resource]
+      exporters: [signalfx]

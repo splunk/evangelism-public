@@ -1,6 +1,25 @@
 version: '3.8'
 
 services:
+  otel-collector:
+    image: quay.io/signalfx/splunk-otel-collector:latest
+    ports:
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+      - "13133:13133" # Health check
+    environment:
+      SPLUNK_REALM: "${SPLUNK_REALM:-us1}"
+      SPLUNK_ACCESS_TOKEN: "${SPLUNK_ACCESS_TOKEN}"
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel/config.yaml
+    command: ["--config", "/etc/otel/config.yaml"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:13133/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   postgres:
     image: postgres:15-alpine
     environment:
