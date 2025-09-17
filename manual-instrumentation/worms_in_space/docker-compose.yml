@@ -45,16 +45,17 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      otel-collector:
+        condition: service_started
     environment:
       DATABASE_URL: "ecto://worms:spacepass@postgres/worms_in_space_dev"
       SECRET_KEY_BASE: "your-secret-key-base-here"
       PHX_HOST: "localhost"
       MIX_ENV: "dev"
-      # OpenTelemetry/Splunk Configuration
-      SPLUNK_REALM: "${SPLUNK_REALM:-us1}"
-      SPLUNK_ACCESS_TOKEN: "${SPLUNK_ACCESS_TOKEN}"
+      # OpenTelemetry Configuration
       OTEL_SERVICE_NAME: "${OTEL_SERVICE_NAME:-worms-in-space-backend}"
       OTEL_ENVIRONMENT: "${OTEL_ENVIRONMENT:-development}"
+      OTEL_COLLECTOR_ENDPOINT: "http://otel-collector:4317"
     volumes:
       - .:/app
       - deps:/app/deps

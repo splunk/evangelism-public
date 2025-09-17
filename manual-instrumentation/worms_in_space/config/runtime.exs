@@ -8,10 +8,9 @@ import Config
 # The block below contains prod specific runtime configuration.
 
 # OpenTelemetry Configuration
-splunk_realm = System.get_env("SPLUNK_REALM", "us0")
-splunk_access_token = System.get_env("SPLUNK_ACCESS_TOKEN", "")
 service_name = System.get_env("OTEL_SERVICE_NAME", "worms-in-space-backend")
 environment = System.get_env("OTEL_ENVIRONMENT", "development")
+otel_collector_endpoint = System.get_env("OTEL_COLLECTOR_ENDPOINT", "http://otel-collector:4317")
 
 config :opentelemetry,
   resource: [
@@ -21,9 +20,6 @@ config :opentelemetry,
     },
     deployment: %{
       environment: environment
-    },
-    splunk: %{
-      realm: splunk_realm
     }
   ],
   span_processor: :batch,
@@ -32,10 +28,8 @@ config :opentelemetry,
 
 config :opentelemetry_exporter,
   otlp_protocol: :grpc,
-  otlp_endpoint: "https://ingest.#{splunk_realm}.signalfx.com:443",
-  otlp_headers: [
-    {"x-sf-token", splunk_access_token}
-  ]
+  otlp_endpoint: otel_collector_endpoint,
+  otlp_headers: []
 
 # Start the phoenix server if environment is set and running in a release
 if System.get_env("PHX_SERVER") && System.get_env("RELEASE_NAME") do
