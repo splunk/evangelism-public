@@ -12,7 +12,7 @@ COPY ./test /app/test
 COPY ./config /app/config
 COPY ./scripts /app/scripts
 COPY ./mix.exs /app/mix.exs
-COPY --from=worms-in-space-npm /app/npm/node_modules /app/node_modules
+COPY --from=worms-in-space-npm /app/npm/node_modules /app/assets/node_modules
 RUN apk add inotify-tools postgresql-client
 RUN chmod +x /app/scripts/start.sh
 RUN mix local.hex --force && mix local.rebar --force && mix do deps.get, compile

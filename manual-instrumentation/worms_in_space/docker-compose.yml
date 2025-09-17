@@ -57,10 +57,14 @@ services:
       OTEL_ENVIRONMENT: "${OTEL_ENVIRONMENT:-development}"
       OTEL_COLLECTOR_ENDPOINT: "http://otel-collector:4317"
     volumes:
-      - .:/app
+      - ./lib:/app/lib
+      - ./config:/app/config
+      - ./test:/app/test
+      - ./priv:/app/priv
+      - ./mix.exs:/app/mix.exs
+      - ./mix.lock:/app/mix.lock
       - deps:/app/deps
       - build:/app/_build
-      - node_modules:/app/assets/node_modules
     command: sh -c "echo 'Waiting for PostgreSQL...' && while ! pg_isready -h postgres -U worms; do sleep 1; done && echo 'PostgreSQL is ready!' && mix deps.get && mix ecto.create && mix ecto.migrate && mix phx.server"
 
 
@@ -68,4 +72,3 @@ volumes:
   postgres_data:
   deps:
   build:
-  node_modules:
