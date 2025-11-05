@@ -1,0 +1,16 @@
+# Splunk Observability Cloud Configuration
+# Copy this file to terraform.tfvars and fill in your values
+# WARNING: Never commit terraform.tfvars to version control!
+
+# Splunk Observability Cloud realm
+# Valid values: us0, us1, eu0, eu1, au0, jp0
+splunk_realm = "us1"
+
+# Splunk Observability Cloud API access token
+# This is NOT the ingest token - it must have API permissions to manage resources
+# Get this from: Settings > Access Tokens in Splunk Observability Cloud UI
+# signalfx_access_token = "your-access-token-here"
+
+# Recommended: Use environment variables instead of this file
+# export TF_VAR_splunk_realm="us1"
+# export TF_VAR_signalfx_access_token="your-token"
