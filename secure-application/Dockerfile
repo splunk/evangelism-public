@@ -8,10 +8,10 @@ RUN mvn package -DskipTests -B
 FROM eclipse-temurin:17-jre
 WORKDIR /app
 
-# Download the standard Splunk OTel Java Agent (APM only, no Application Security)
+# Download the Splunk OTel Java Agent with CSA (Application Security)
 ARG AGENT_VERSION=2.25.1
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/* \
-    && curl -L "https://repo1.maven.org/maven2/com/splunk/splunk-otel-javaagent/${AGENT_VERSION}/splunk-otel-javaagent-${AGENT_VERSION}.jar" \
+    && curl -L "https://repo1.maven.org/maven2/com/splunk/splunk-otel-javaagent-csa/${AGENT_VERSION}/splunk-otel-javaagent-csa-${AGENT_VERSION}.jar" \
        -o /app/splunk-otel-javaagent.jar
 
 COPY --from=build /app/target/door-game-1.0.0.jar /app/door-game.jar

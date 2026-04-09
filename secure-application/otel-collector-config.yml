@@ -43,7 +43,7 @@ exporters:
     sync_host_metadata: true
 
   debug:
-    verbosity: basic
+    verbosity: detailed
 
 service:
   extensions: [headers_setter, health_check]
@@ -59,4 +59,4 @@ service:
     logs:
       receivers: [otlp]
       processors: [memory_limiter, batch, resourcedetection]
-      exporters: [debug]
+      exporters: [signalfx, debug]
