@@ -1,0 +1,24 @@
+services:
+  otel-collector:
+    image: quay.io/signalfx/splunk-otel-collector:latest
+    environment:
+      - SPLUNK_ACCESS_TOKEN=${SPLUNK_ACCESS_TOKEN}
+      - SPLUNK_REALM=${SPLUNK_REALM}
+      - SPLUNK_CONFIG=/etc/otel/collector/custom_config.yaml
+    volumes:
+      - ./otel-collector-config.yml:/etc/otel/collector/custom_config.yaml
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+
+  door-game:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - OTEL_SERVICE_NAME=door-game
+      - OTEL_RESOURCE_ATTRIBUTES=deployment.environment.name=lab,service.name=door-game,service.namespace=door-game-ns
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+    depends_on:
+      - otel-collector
