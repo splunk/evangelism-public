@@ -1,0 +1,2 @@
+A = data('k8s.pod.phase', filter=filter('k8s.cluster.name', 'break-a-pod-demo') and filter('k8s.namespace.name', 'k1')).publish(label='A')
+detect(when(A < threshold(2), lasting='1m'), auto_resolve_after='1m').publish('Pending pod status')

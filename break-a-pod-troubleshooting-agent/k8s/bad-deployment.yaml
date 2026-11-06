@@ -1,0 +1,26 @@
+# A deployment that can never start: busybox:1.00-sfx does not exist on Docker Hub,
+# so the pod sits in Pending with ErrImagePull / ImagePullBackOff.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: k1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ipbo-busybox
+  namespace: k1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ipbo-busybox
+  template:
+    metadata:
+      labels:
+        app: ipbo-busybox
+    spec:
+      containers:
+        - name: bb
+          image: busybox:1.00-sfx # doesn't exist
+          command: ["/bin/sh", "-c", "sleep 3600"]

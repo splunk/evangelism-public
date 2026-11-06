@@ -28,6 +28,16 @@ Resources for establishing and promoting observability initiatives within organi
 
 This presentation template is referenced in the Splunk blog post about establishing observability centers of excellence and taking your observability strategy to the next level.
 
+### Break a Pod: AI Troubleshooting Agent (`break-a-pod-troubleshooting-agent/`)
+
+A reproducible Kubernetes failure for the AI troubleshooting agent and remediation plan in Splunk Observability Cloud:
+
+- **Scenario**: Deploy an image tag that doesn't exist, so the pod is stuck in Pending with ImagePullBackOff
+- **Setup**: Splunk Distribution of the OpenTelemetry Collector via Helm, plus a `k8s.pod.phase < 2` detector, with one script (`scripts/run-demo.sh`)
+- **Walkthrough**: Open the alert, review the root cause and evidence, ask follow-up questions, then work through the remediation plan and apply the fix yourself
+
+**Getting Started**: Navigate to `break-a-pod-troubleshooting-agent/` and follow the README.
+
 ## How to Use This Repository
 
 1. **Learning Manual Instrumentation**: Start with the `manual-instrumentation/` directory to see practical examples of adding observability to real applications

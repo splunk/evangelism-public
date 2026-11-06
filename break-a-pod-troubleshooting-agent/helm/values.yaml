@@ -1,0 +1,35 @@
+# Values for the Splunk Distribution of the OpenTelemetry Collector for Kubernetes.
+# Secrets (access token, HEC token) and the realm are passed with --set in
+# scripts/00-install-collector.sh so they never land in this file.
+#
+# Reference: https://help.splunk.com/en/splunk-observability-cloud/manage-data/splunk-distribution-of-the-opentelemetry-collector/get-started-with-the-splunk-distribution-of-the-opentelemetry-collector/collector-for-kubernetes/install-with-helm
+
+clusterName: break-a-pod-demo
+environment: break-a-pod-demo
+
+# Metrics, including k8s.pod.phase, go to Splunk Observability Cloud.
+splunkObservability:
+  metricsEnabled: true
+  tracesEnabled: true
+
+# Pod and container logs go to the Splunk platform over HEC.
+# The AI troubleshooting agent reads these logs during root cause analysis.
+# For the "no logs" comparison, install with NO_LOGS=1, which leaves the HEC
+# endpoint unset so the chart doesn't send logs at all.
+splunkPlatform:
+  index: main
+  logsEnabled: true
+  metricsEnabled: false
+
+# Kubernetes events ("Failed to pull image ...") are the evidence for an
+# ImagePullBackOff: the container never starts, so it writes no logs.
+# This sends events straight to Observability Cloud with the access token,
+# so it works without a Splunk platform or HEC.
+clusterReceiver:
+  eventsEnabled: true
+featureGates:
+  sendK8sEventsToSplunkO11y: true
+
+# Uncomment and set for managed clusters (EKS, GKE, AKS) to get provider metadata.
+# cloudProvider: aws
+# distribution: eks
