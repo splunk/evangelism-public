@@ -1,0 +1,4 @@
+.env
+.DS_Store
+# written by scripts/01-create-detector.sh; holds the ID of the detector in your org
+detector/.detector-id

@@ -1,0 +1,11 @@
+# Extra values for local clusters (minikube, kind, k3d).
+# Their kubelets serve self-signed certificates without IP SANs, so the
+# kubeletstats receiver can't verify them and drops node, pod, and container
+# CPU and memory metrics. Don't use this on a production cluster.
+# scripts/00-install-collector.sh adds this file automatically when it detects
+# a local cluster.
+agent:
+  config:
+    receivers:
+      kubelet_stats:
+        insecure_skip_verify: true
