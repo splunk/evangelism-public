@@ -50,8 +50,8 @@ export HEC_TOKEN=...
 
 Then, in Splunk Observability Cloud:
 
-4. Go to **Alerts** and open the **[Demo] Pending pod status** alert. If your org is
-   opted in by default, select **Run root cause analysis**.
+4. Go to **Alerts** and open the **[Demo] Pending pod status** alert. Root cause
+   analysis doesn't run automatically by default, so select **Run root cause analysis**.
 5. Watch the investigation stream in the AI Assistant. It can take several minutes.
 6. Read the primary root cause on **Overview**, then check **Evidence** to see what the agent used.
 7. Ask the AI Assistant follow-up questions without leaving the alert, for example:
@@ -59,7 +59,8 @@ Then, in Splunk Observability Cloud:
    - How often has this detector fired before?
 8. On **Root Cause Analysis**, select **View AI-generated action plan**. Run each
    kubectl step in your terminal, paste the output back, and submit. Apply the fix
-   the plan gives you, then run its verification step.
+   the plan gives you, then run its verification step. In a real setup, fix the tag
+   in your manifest or Helm values too, so the next deploy doesn't bring it back.
 
 Stuck? `scripts/answer-key-fix.sh` has the fix. Try the action plan first.
 
@@ -78,12 +79,13 @@ Stuck? `scripts/answer-key-fix.sh` has the fix. Try the action plan first.
 | `helm/values.yaml` | Collector values: cluster name, environment, logs and Kubernetes events |
 | `helm/values-local.yaml` | Added automatically on minikube, kind and k3d (self-signed kubelet certificates) |
 | `detector/pending-pod.signalflow` | Detector program: `k8s.pod.phase < 2` in namespace `k1` for 1 minute |
-| `k8s/bad-deployment.yaml` | Namespace `k1` and deployment `ipbo-busybox` with a nonexistent image tag |
+| `k8s/bad-deployment.yaml` | Namespace `k1` and Deployment `ipbo-busybox` with a nonexistent image tag |
 | `scripts/` | Install, create detector, break, answer key, cleanup |
 
 ## Docs
 
 - [AI troubleshooting agent and remediation plan in Splunk Observability Cloud](https://help.splunk.com/en/splunk-observability-cloud/create-alerts-detectors-and-service-level-objectives/create-alerts-and-detectors/ai-troubleshooting-agent-and-remediation-plan)
+- [Accelerate Resolution and Prevent Future Outages with Splunk Observability Cloud](https://www.splunk.com/en_us/blog/observability/ai-troubleshooting-agent-in-splunk-observability-cloud.html) (overview on the Splunk blog)
 - [Install the Collector for Kubernetes using Helm](https://help.splunk.com/en/splunk-observability-cloud/manage-data/splunk-distribution-of-the-opentelemetry-collector/get-started-with-the-splunk-distribution-of-the-opentelemetry-collector/collector-for-kubernetes/install-with-helm)
 - [Set up Log Observer Connect for Splunk Cloud Platform](https://help.splunk.com/en/splunk-observability-cloud/manage-data/view-splunk-platform-logs/set-up-log-observer-connect-for-splunk-cloud-platform)
 - [Set up Log Observer Connect for Splunk Enterprise](https://help.splunk.com/en/splunk-observability-cloud/manage-data/view-splunk-platform-logs/set-up-log-observer-connect-for-splunk-enterprise)

@@ -1,4 +1,4 @@
-# A deployment that can never start: busybox:1.00-sfx does not exist on Docker Hub,
+# A Deployment that can never start: busybox:1.00-sfx does not exist on Docker Hub,
 # so the pod sits in Pending with ErrImagePull / ImagePullBackOff.
 apiVersion: v1
 kind: Namespace
